@@ -11,3 +11,10 @@ app.config['DEBUG'] = False
 
 db.init_app(app)
 Migrate(app, db)
+
+@app.route('/')
+def home():
+    return jsonify('Creando Back-End Te-Cuido')
+
+if __name__ == "__main__":
+    app.run(host='localhost', port=5432)
