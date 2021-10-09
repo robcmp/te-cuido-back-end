@@ -19,7 +19,6 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     occupation = db.Column(db.String(30), nullable=False)
     vaccinated = db.Column(db.Boolean, nullable=False)
-    occupation = db.Column(db.String(30), nullable=False)
     user_type = db.Column(db.Integer)
     isActive = db.Column(db.Boolean, default=False)
     payments = db.relationship('Payment',backref='user',lazy=True)
@@ -34,7 +33,15 @@ class User(db.Model):
             'lastname': self.name,
             'password': self.password,
             'email': self.email,
+            'numberID': self.numberID,
+            'country': self.country,
+            'city': self.city,
+            'phone': self.phone,
+            'occupation': self.occupation,
+            'vaccinated': self.vaccinated,
+            'user_type': self.user_type,
             'isActive': self.isActive
+            #'payments': self.payments
         }
 
     def serialize_just_username(self):
