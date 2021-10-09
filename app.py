@@ -11,4 +11,4 @@ app.config['DEBUG'] = False
 
 db.init_app(app)
 Migrate(app, db)
-  
+    
