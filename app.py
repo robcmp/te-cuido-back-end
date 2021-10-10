@@ -82,7 +82,6 @@ def userById(id):
 
     return jsonify(user.serialize()), 200
 
-
 @app.route("/login", methods=["POST"])
 @cross_origin()
 def login():
