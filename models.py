@@ -44,10 +44,10 @@ class User(db.Model):
             #'payments': self.payments
         }
 
-    def serialize_just_username(self):
+    def serialize_just_login(self):
         return {
-            'id': self.id,
-            'name': self.name
+            'email': self.email,
+            'password': self.password
         }
 
 #Enum class gender to be set in class Service 

@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from models import db, User
 from flask_migrate import Migrate
+from flask_cors import CORS, cross_origin
 
 
 app = Flask(__name__)
@@ -10,6 +11,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 app.config['ENV'] = "development"
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 db.init_app(app)
 Migrate(app, db)
@@ -79,6 +82,23 @@ def userById(id):
 
     return jsonify(user.serialize()), 200
 
+
+@app.route("/login", methods=["POST"])
+@cross_origin()
+def login():
+    request.get_json(force=True)
+    print(request.json)
+
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    # Query your database for username and password
+    user = User.query.filter_by(email=email, password=password).first()
+    if user is None:
+        # the user was not found on the database
+        return jsonify({"msg": "Usuario o contraseña invalida"}), 401
+    # create a new token with the user id inside
+
+    return jsonify({ "msg": "Sesión iniciada satisfactoriamente" }), 200
 
 if __name__ == "__main__":
     app.run()
