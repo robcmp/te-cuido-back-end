@@ -46,5 +46,60 @@ def user():
 
     return jsonify(user.serialize()), 200
 
+
+@app.route("/user/<int:id>", methods=["GET","POST"])
+def userById(id):
+    if request.method == "GET":
+        if id is not None:
+            user = User.query.get(id)
+            if user is None:
+                return jsonify('Missing id parameter in route'), 404
+            else:
+                return jsonify(user.serialize()), 200
+        else:
+            return jsonify('Missing id parameter in route'), 404
+    else:
+        user = User()
+        user.name = request.json.get("name")
+        user.lastname = request.json.get("lastname")
+        user.password = request.json.get("password")
+        user.email = request.json.get("email")
+        user.numberID = request.json.get("numberID")
+        user.country = request.json.get("country")
+        user.city = request.json.get("city")
+        user.phone = request.json.get("phone")
+        user.occupation = request.json.get("occupation")
+        user.vaccinated = request.json.get("vaccinated")
+        user.user_type = request.json.get("user_type")
+        user.isActive = request.json.get("isActive")
+        #user.payments = request.json.get("payments")
+        
+        db.session.add(user)
+        db.session.commit()
+
+    return jsonify(user.serialize()), 200
+
+
+@app.route("/login/<int:id>", methods=["GET","POST"])
+def login(id):
+    if request.method == "GET":
+        if id is not None:
+            user = User.query.get(id)
+            if user is None:
+                return jsonify('Missing id parameter in route'), 404
+            else:
+                return jsonify(user.serialize_just_login()), 200
+        else:
+            return jsonify('Missing id parameter in route'), 404
+    else:
+        user = User()
+        user.email = request.json.get("email")
+        user.password = request.json.get("password")
+        
+        db.session.add(user)
+        db.session.commit()
+
+    return jsonify(user.serialize()), 200
+
 if __name__ == "__main__":
     app.run()
