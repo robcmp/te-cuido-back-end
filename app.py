@@ -5,21 +5,14 @@ from flask_migrate import Migrate
 
 
 app = Flask(__name__)
-<<<<<<< HEAD
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/tecuido'
-=======
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
->>>>>>> 291b355d01d3a22e2493a039280395160947dcce
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 app.config['ENV'] = "development"
 
 db.init_app(app)
 Migrate(app, db)
-<<<<<<< HEAD
-    
-=======
 
 @app.route('/')
 def home():
@@ -55,4 +48,3 @@ def user():
 
 if __name__ == "__main__":
     app.run()
->>>>>>> 291b355d01d3a22e2493a039280395160947dcce
