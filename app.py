@@ -80,5 +80,26 @@ def userById(id):
     return jsonify(user.serialize()), 200
 
 
+@app.route("/login/<int:id>", methods=["GET","POST"])
+def login(id):
+    if request.method == "GET":
+        if id is not None:
+            user = User.query.get(id)
+            if user is None:
+                return jsonify('Missing id parameter in route'), 404
+            else:
+                return jsonify(user.serialize_just_login()), 200
+        else:
+            return jsonify('Missing id parameter in route'), 404
+    else:
+        user = User()
+        user.email = request.json.get("email")
+        user.password = request.json.get("password")
+        
+        db.session.add(user)
+        db.session.commit()
+
+    return jsonify(user.serialize()), 200
+
 if __name__ == "__main__":
     app.run()
