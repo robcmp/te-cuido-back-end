@@ -19,7 +19,7 @@ class User(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     occupation = db.Column(db.String(30), nullable=False)
     vaccinated = db.Column(db.Boolean, nullable=False)
-    user_type = db.Column(db.Integer)
+    user_type = db.Column(db.Boolean,default=False)
     isActive = db.Column(db.Boolean, default=False)
     payments = db.relationship('Payment',backref='user',lazy=True)
 
@@ -31,7 +31,6 @@ class User(db.Model):
             'id': self.id,
             'name': self.name,
             'lastname': self.name,
-            'password': self.password,
             'email': self.email,
             'numberID': self.numberID,
             'country': self.country,
@@ -44,10 +43,10 @@ class User(db.Model):
             #'payments': self.payments
         }
 
-    def serialize_just_username(self):
+    def serialize_just_login(self):
         return {
-            'id': self.id,
-            'name': self.name
+            'email': self.email,
+            'password': self.password
         }
 
 #Enum class gender to be set in class Service 

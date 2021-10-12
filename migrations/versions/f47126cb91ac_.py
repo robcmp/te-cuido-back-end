@@ -1,5 +1,6 @@
 """empty message
 
+<<<<<<< HEAD:migrations/versions/4b428232849d_.py
 <<<<<<< HEAD:migrations/versions/164b97c6cf5c_.py
 Revision ID: 164b97c6cf5c
 Revises: 
@@ -9,6 +10,11 @@ Revision ID: 4b428232849d
 Revises: 
 Create Date: 2021-10-09 12:28:23.640145
 >>>>>>> 291b355d01d3a22e2493a039280395160947dcce:migrations/versions/4b428232849d_.py
+=======
+Revision ID: f47126cb91ac
+Revises: 
+Create Date: 2021-10-11 18:26:30.598871
+>>>>>>> 4992c976a0c68635c651bc23e30981657c42acc8:migrations/versions/f47126cb91ac_.py
 
 """
 from alembic import op
@@ -16,11 +22,15 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
+<<<<<<< HEAD:migrations/versions/4b428232849d_.py
 <<<<<<< HEAD:migrations/versions/164b97c6cf5c_.py
 revision = '164b97c6cf5c'
 =======
 revision = '4b428232849d'
 >>>>>>> 291b355d01d3a22e2493a039280395160947dcce:migrations/versions/4b428232849d_.py
+=======
+revision = 'f47126cb91ac'
+>>>>>>> 4992c976a0c68635c651bc23e30981657c42acc8:migrations/versions/f47126cb91ac_.py
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -45,9 +55,9 @@ def upgrade():
     sa.Column('country', sa.String(length=20), nullable=False),
     sa.Column('city', sa.String(length=20), nullable=False),
     sa.Column('phone', sa.String(length=20), nullable=False),
-    sa.Column('vaccinated', sa.Boolean(), nullable=False),
     sa.Column('occupation', sa.String(length=30), nullable=False),
-    sa.Column('user_type', sa.Integer(), nullable=True),
+    sa.Column('vaccinated', sa.Boolean(), nullable=False),
+    sa.Column('user_type', sa.Boolean(), nullable=True),
     sa.Column('isActive', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
