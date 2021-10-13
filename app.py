@@ -6,11 +6,7 @@ from flask_cors import CORS, cross_origin
 
 
 app = Flask(__name__)
-<<<<<<< HEAD
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
-=======
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
->>>>>>> 4992c976a0c68635c651bc23e30981657c42acc8
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
