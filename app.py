@@ -6,7 +6,11 @@ from flask_cors import CORS, cross_origin
 
 
 app = Flask(__name__)
+<<<<<<< HEAD
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
+=======
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
+>>>>>>> 61fb242d2fa6be5e50b4057f361c28628f5295bd
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -22,14 +26,17 @@ def home():
     return jsonify('Creando Back-End Te-Cuido')
 
 @app.route("/user", methods=["POST", "GET"])
+@cross_origin()
 def user():
     if request.method == "GET":
-        user = User.query.all()
-        user = list(map(lambda user: user.serialize(), user))
+        user = User.query.all ()
+        user = list(map(lambda x: x.serialize(), user))
+        return jsonify(user)
         if user is not None:
-            return jsonify(user)
+            return jsonify(user.serialize())
     else:
         user = User()
+        # request.get_json(force=True)
         user.name = request.json.get("name")
         user.lastname = request.json.get("lastname")
         user.password = request.json.get("password")
@@ -85,8 +92,8 @@ def userById(id):
 @app.route("/login", methods=["POST"])
 @cross_origin()
 def login():
-    request.get_json(force=True)
-    print(request.json)
+    # request.get_json(force=True)
+    # print(request.json)
 
     email = request.json.get("email", None)
     password = request.json.get("password", None)
@@ -97,7 +104,7 @@ def login():
         return jsonify({"msg": "Usuario o contraseña invalida"}), 401
     # create a new token with the user id inside
 
-    return jsonify({ "msg": "Sesión iniciada satisfactoriamente" }), 200
+    return jsonify(user.serialize()), 200
 
 if __name__ == "__main__":
     app.run()
