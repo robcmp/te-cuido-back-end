@@ -1,14 +1,8 @@
 """empty message
 
-<<<<<<< HEAD:migrations/versions/81f130271504_.py
-Revision ID: 81f130271504
-Revises: 
-Create Date: 2021-10-11 20:48:59.999432
-=======
 Revision ID: f47126cb91ac
 Revises: 
 Create Date: 2021-10-11 18:26:30.598871
->>>>>>> 61fb242d2fa6be5e50b4057f361c28628f5295bd:migrations/versions/f47126cb91ac_.py
 
 """
 from alembic import op
@@ -16,11 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<< HEAD:migrations/versions/81f130271504_.py
-revision = '81f130271504'
-=======
 revision = 'f47126cb91ac'
->>>>>>> 61fb242d2fa6be5e50b4057f361c28628f5295bd:migrations/versions/f47126cb91ac_.py
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -47,11 +37,7 @@ def upgrade():
     sa.Column('phone', sa.String(length=20), nullable=False),
     sa.Column('occupation', sa.String(length=30), nullable=False),
     sa.Column('vaccinated', sa.Boolean(), nullable=False),
-<<<<<<< HEAD:migrations/versions/81f130271504_.py
-    sa.Column('user_type', sa.Integer(), nullable=True),
-=======
     sa.Column('user_type', sa.Boolean(), nullable=True),
->>>>>>> 61fb242d2fa6be5e50b4057f361c28628f5295bd:migrations/versions/f47126cb91ac_.py
     sa.Column('isActive', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
