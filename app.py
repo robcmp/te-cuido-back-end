@@ -36,6 +36,7 @@ def user():
             return jsonify(user.serialize())
     else:
         user = User()
+        # request.get_json(force=True)
         user.name = request.json.get("name")
         user.lastname = request.json.get("lastname")
         user.password = request.json.get("password")
@@ -91,8 +92,8 @@ def userById(id):
 @app.route("/login", methods=["POST"])
 @cross_origin()
 def login():
-    request.get_json(force=True)
-    print(request.json)
+    # request.get_json(force=True)
+    # print(request.json)
 
     email = request.json.get("email", None)
     password = request.json.get("password", None)
