@@ -10,17 +10,17 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
-    lastname = db.Column(db.String(30), nullable=False)
+    last_name = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(30), nullable=False)
-    email = db.Column(db.String(30), nullable=False)
-    numberID = db.Column(db.String(30), nullable=False)
+    email = db.Column(db.String(30), nullable=False,unique=True)
+    number_id = db.Column(db.String(30), nullable=False,unique=True)
     country = db.Column(db.String(20), nullable=False)
     city = db.Column(db.String(20), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     occupation = db.Column(db.String(30), nullable=False)
     vaccinated = db.Column(db.Boolean, nullable=False)
     user_type = db.Column(db.Boolean,default=False)
-    isActive = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=False)
     payments = db.relationship('Payment',backref='user',lazy=True)
 
     def __repr__(self):
@@ -30,16 +30,16 @@ class User(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'lastname': self.name,
+            'last_name': self.last_name,
             'email': self.email,
-            'numberID': self.numberID,
+            'number_id': self.number_id,
             'country': self.country,
             'city': self.city,
             'phone': self.phone,
             'occupation': self.occupation,
             'vaccinated': self.vaccinated,
             'user_type': self.user_type,
-            'isActive': self.isActive
+            'is_active': self.is_active
             #'payments': self.payments
         }
 
