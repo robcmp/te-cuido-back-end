@@ -6,7 +6,7 @@ from flask_cors import CORS, cross_origin
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:adminU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -105,6 +105,42 @@ def login():
     # create a new token with the user id inside
 
     return jsonify(user.serialize()), 200
+
+@app.route("/edit_user/<int:id>", methods=["GET","POST"])
+@cross_origin()
+def edit_user(id):
+    if request.method == "GET":
+        if id is not None:
+            user = User.query.get(id)
+            if user is None:
+                return jsonify('Missing id parameter in route'), 404
+            else:
+                return jsonify(user.serialize()), 200
+        else:
+            return jsonify('Missing id parameter in route'), 404
+    else:
+        user = User()
+        # request.get_json(force=True) 
+        user.name = request.json.get("name")
+        user.last_name = request.json.get("last_name")
+        user.password = request.json.get("password")
+        user.email = request.json.get("email")
+        user.number_id = request.json.get("number_id")
+        user.country = request.json.get("country")
+        user.city = request.json.get("city")
+        user.phone = request.json.get("phone")
+        user.occupation = request.json.get("occupation")
+        #user.vaccinated = request.json.get("vaccinated")
+        #user.user_type = request.json.get("user_type")
+        #user.is_active = request.json.get("is_active")
+        #user.payments = request.json.get("payments")
+    
+        db.session.add(user)
+        db.session.commit()
+        
+    return jsonify(user.serialize()), 200
+
+
 
 if __name__ == "__main__":
     app.run()
