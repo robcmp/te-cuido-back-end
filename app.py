@@ -47,7 +47,7 @@ def user():
         user.phone = request.json.get("phone")
         user.occupation = request.json.get("occupation")
         user.vaccinated = request.json.get("vaccinated")
-        user.user_type = request.json.get("user_type")
+        user.role = request.json.get("role")
         user.is_active = request.json.get("is_active")
         #user.payments = request.json.get("payments")
     
@@ -80,7 +80,7 @@ def userById(id):
         user.phone = request.json.get("phone")
         user.occupation = request.json.get("occupation")
         user.vaccinated = request.json.get("vaccinated")
-        user.user_type = request.json.get("user_type")
+        user.role = request.json.get("role")
         user.is_active = request.json.get("is_active")
         #user.payments = request.json.get("payments")
         
@@ -103,6 +103,19 @@ def login():
         # the user was not found on the database
         return jsonify({"msg": "Usuario o contraseña invalida"}), 401
     # create a new token with the user id inside
+
+    return jsonify(user.serialize()), 200
+
+@app.route("/banuser/<int:id>", methods=["PUT"])
+@cross_origin()
+def banuser(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is None :
+            return jsonify("Usuario no existe."), 404
+            # user = User.query.filter_by(id=user.id).first()
+        user.is_active = request.json.get("is_active")
+        db.session.commit()
 
     return jsonify(user.serialize()), 200
 
