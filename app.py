@@ -10,7 +10,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:adminU@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -55,7 +55,7 @@ def user():
         user.phone = request.json.get("phone")
         user.occupation = request.json.get("occupation")
         user.vaccinated = request.json.get("vaccinated")
-        user.user_type = request.json.get("user_type")
+        user.role = request.json.get("role")
         user.is_active = request.json.get("is_active")
         #user.payments = request.json.get("payments")
     
@@ -87,7 +87,7 @@ def userById(id):
         user.phone = request.json.get("phone")
         user.occupation = request.json.get("occupation")
         user.vaccinated = request.json.get("vaccinated")
-        user.user_type = request.json.get("user_type")
+        user.role = request.json.get("role")
         user.is_active = request.json.get("is_active")
         #user.payments = request.json.get("payments")
         
@@ -110,6 +110,19 @@ def login():
         # the user was not found on the database
         return jsonify({"msg": "Usuario o contraseña invalida"}), 401
     # create a new token with the user id inside
+
+    return jsonify(user.serialize()), 200
+
+@app.route("/banuser/<int:id>", methods=["PUT"])
+@cross_origin()
+def banuser(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is None :
+            return jsonify("Usuario no existe."), 404
+            # user = User.query.filter_by(id=user.id).first()
+        user.is_active = request.json.get("is_active")
+        db.session.commit()
 
     return jsonify(user.serialize()), 200
 
@@ -152,6 +165,7 @@ def register():
     name = request.json.get("name")
     last_name = request.json.get("last_name")
     password = request.json.get("password")
+    birth_date = request.json.get("birth_date")
     email = request.json.get("email")
     number_id = request.json.get("number_id")
     country = request.json.get("country")
@@ -159,7 +173,7 @@ def register():
     phone = request.json.get("phone")
     occupation = request.json.get("occupation")
     vaccinated = request.json.get("vaccinated")
-    user_type = request.json.get("user_type")
+    role = request.json.get("role")
     is_active = request.json.get("is_active")
     #payments = request.json.get("payments")
     user = User.query.filter_by(email=email).first()
@@ -176,6 +190,8 @@ def register():
             return jsonify({
                 "msg": "Contraseña no válida"
             }), 400
+
+        user.birth_date= birth_date
         #Validating email
         email_regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
         if re.search(email_regex, email):
@@ -190,7 +206,7 @@ def register():
         user.phone = phone
         user.occupation = occupation
         user.vaccinated = vaccinated
-        user.user_type = user_type
+        user.role = role
         user.is_active = is_active
         #user.payments = request.json.get("payments")
         db.session.add(user)
