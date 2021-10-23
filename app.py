@@ -102,16 +102,37 @@ def login():
     # request.get_json(force=True)
     # print(request.json)
 
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
+    email = request.json.get("email")
+    password = request.json.get("password")
+    if password is None:
+        return jsonify({
+            "msg":"Contraseña inválida o el campo contraseña está vacío"
+        }), 400
+    
+    if email is None:
+        return jsonify({
+            "msg":"email inválido o el campo email está vacío"
+        }), 400
+    
     # Query your database for username and password
-    user = User.query.filter_by(email=email, password=password).first()
+    user = User.query.filter_by(email=email).first()
+    
     if user is None:
         # the user was not found on the database
-        return jsonify({"msg": "Usuario o contraseña invalida"}), 401
+        return jsonify({
+            "msg": "El usuario no existe"
+        }), 401
+    elif bcrypt.check_password_hash(user.password, password):
+        return jsonify({
+            "msg": "Inicio de sesión satisfactorio"
+        }), 200
+    else:
+        return jsonify({
+            "msg":"Credenciales de acceso erróneas"
+        }), 400
     # create a new token with the user id inside
 
-    return jsonify(user.serialize()), 200
+    #return jsonify(user.serialize()), 200
 
 @app.route("/banuser/<int:id>", methods=["PUT"])
 @cross_origin()
@@ -184,7 +205,7 @@ def register():
         #Validating password
         password_regex = '^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$'
         if re.search(password_regex, password):
-            password_hash = bcrypt.generate_password_hash(password)
+            password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
             user.password = password_hash
         else:
             return jsonify({
