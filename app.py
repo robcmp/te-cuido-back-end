@@ -10,7 +10,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:adminU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -113,7 +113,6 @@ def login():
 
     return jsonify(user.serialize()), 200
 
-<<<<<<< HEAD
 @app.route("/edit_user/<int:id>", methods=["GET","POST"])
 @cross_origin()
 def edit_user(id):
@@ -148,10 +147,6 @@ def edit_user(id):
         
     return jsonify(user.serialize()), 200
 
-
-=======
-
-    
 @app.route("/register", methods=["POST"])
 def register():
     name = request.json.get("name")
@@ -167,7 +162,6 @@ def register():
     user_type = request.json.get("user_type")
     is_active = request.json.get("is_active")
     #payments = request.json.get("payments")
-
     user = User.query.filter_by(email=email).first()
     if user is None:
         user = User()
@@ -199,10 +193,8 @@ def register():
         user.user_type = user_type
         user.is_active = is_active
         #user.payments = request.json.get("payments")
-
         db.session.add(user)
         db.session.commit()
-
         return jsonify({
             "msg": "User registered successfully"
         }), 200
@@ -210,7 +202,8 @@ def register():
         return jsonify({
             "msg": "User already exist"
         }), 400
->>>>>>> 0d5990f655e1810903568a01e5bd6f89e40106f9
+
+
 
 if __name__ == "__main__":
     app.run()
