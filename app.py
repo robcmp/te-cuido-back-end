@@ -10,7 +10,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:adminU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -113,8 +113,40 @@ def login():
 
     return jsonify(user.serialize()), 200
 
-
+@app.route("/edit_user/<int:id>", methods=["GET","POST"])
+@cross_origin()
+def edit_user(id):
+    if request.method == "GET":
+        if id is not None:
+            user = User.query.get(id)
+            if user is None:
+                return jsonify('Missing id parameter in route'), 404
+            else:
+                return jsonify(user.serialize()), 200
+        else:
+            return jsonify('Missing id parameter in route'), 404
+    else:
+        user = User()
+        # request.get_json(force=True) 
+        user.name = request.json.get("name")
+        user.last_name = request.json.get("last_name")
+        user.password = request.json.get("password")
+        user.email = request.json.get("email")
+        user.number_id = request.json.get("number_id")
+        user.country = request.json.get("country")
+        user.city = request.json.get("city")
+        user.phone = request.json.get("phone")
+        user.occupation = request.json.get("occupation")
+        #user.vaccinated = request.json.get("vaccinated")
+        #user.user_type = request.json.get("user_type")
+        #user.is_active = request.json.get("is_active")
+        #user.payments = request.json.get("payments")
     
+        db.session.add(user)
+        db.session.commit()
+        
+    return jsonify(user.serialize()), 200
+
 @app.route("/register", methods=["POST"])
 def register():
     name = request.json.get("name")
@@ -130,7 +162,6 @@ def register():
     user_type = request.json.get("user_type")
     is_active = request.json.get("is_active")
     #payments = request.json.get("payments")
-
     user = User.query.filter_by(email=email).first()
     if user is None:
         user = User()
@@ -162,10 +193,8 @@ def register():
         user.user_type = user_type
         user.is_active = is_active
         #user.payments = request.json.get("payments")
-
         db.session.add(user)
         db.session.commit()
-
         return jsonify({
             "msg": "User registered successfully"
         }), 200
@@ -174,5 +203,8 @@ def register():
             "msg": "User already exist"
         }), 400
 
+
+
 if __name__ == "__main__":
     app.run()
+ 
