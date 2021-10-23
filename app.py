@@ -101,7 +101,7 @@ def userById(id):
 def login():
     # request.get_json(force=True)
     # print(request.json)
-
+    
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     if password == "":
