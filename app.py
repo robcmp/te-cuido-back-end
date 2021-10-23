@@ -1,21 +1,29 @@
+import re
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from models import db, User
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
+from flask_bcrypt import Bcrypt
+
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 app.config['ENV'] = "development"
-cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+app.config["JWT_SECRET_KEY"] = 'super-secreta'
+app.config["SECRET_KEY"] = "otra-super-secreta"
 
 db.init_app(app)
 Migrate(app, db)
+cors = CORS(app)
+jwt = JWTManager(app)
+bcrypt = Bcrypt(app)
 
 @app.route('/')
 def home():
@@ -58,16 +66,15 @@ def user():
 
 
 @app.route("/user/<int:id>", methods=["GET","POST"])
+@cross_origin()
 def userById(id):
     if request.method == "GET":
-        if id is not None:
-            user = User.query.get(id)
-            if user is None:
-                return jsonify('Missing id parameter in route'), 404
-            else:
-                return jsonify(user.serialize()), 200
-        else:
+        user = User.query.get(id)
+        if user is None:
             return jsonify('Missing id parameter in route'), 404
+        else:
+            return jsonify(user.serialize()), 200
+        
     else:
         user = User()
         user.name = request.json.get("name")
@@ -118,6 +125,66 @@ def banuser(id):
         db.session.commit()
 
     return jsonify(user.serialize()), 200
+
+    
+@app.route("/register", methods=["POST"])
+def register():
+    name = request.json.get("name")
+    last_name = request.json.get("last_name")
+    password = request.json.get("password")
+    email = request.json.get("email")
+    number_id = request.json.get("number_id")
+    country = request.json.get("country")
+    city = request.json.get("city")
+    phone = request.json.get("phone")
+    occupation = request.json.get("occupation")
+    vaccinated = request.json.get("vaccinated")
+    user_type = request.json.get("user_type")
+    is_active = request.json.get("is_active")
+    #payments = request.json.get("payments")
+
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        user = User()
+        user.name = name
+        user.last_name = last_name
+        #Validating password
+        password_regex = '^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$'
+        if re.search(password_regex, password):
+            password_hash = bcrypt.generate_password_hash(password)
+            user.password = password_hash
+        else:
+            return jsonify({
+                "msg": "Contraseña no válida"
+            }), 400
+        #Validating email
+        email_regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+        if re.search(email_regex, email):
+            user.email = email
+        else:
+            return jsonify({
+                "msg": "Correo electrónico no válido"
+            }), 400
+        user.number_id = number_id
+        user.country = country
+        user.city = city
+        user.phone = phone
+        user.occupation = occupation
+        user.vaccinated = vaccinated
+        user.user_type = user_type
+        user.is_active = is_active
+        #user.payments = request.json.get("payments")
+
+        db.session.add(user)
+        db.session.commit()
+
+        return jsonify({
+            "msg": "User registered successfully"
+        }), 200
+    else:
+        return jsonify({
+            "msg": "User already exist"
+        }), 400
 
 if __name__ == "__main__":
     app.run()
