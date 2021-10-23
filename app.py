@@ -47,9 +47,9 @@ def user():
         user.email = request.json.get("email")
         user.number_id = request.json.get("number_id")
         if User.query.filter_by(email=user.email).first():
-            return jsonify({"msg": "Correo ya utilizado"}), 460
+            return jsonify({"msg": "Correo ya utilizado"}), 404
         if User.query.filter_by(number_id=user.number_id).first():
-            return jsonify({"msg": "DNI ya utilizado"}), 461
+            return jsonify({"msg": "DNI ya utilizado"}), 404
         user.country = request.json.get("country")
         user.city = request.json.get("city")
         user.phone = request.json.get("phone")
@@ -120,6 +120,8 @@ def banuser(id):
         user = User.query.filter_by(id=id).first()
         if user is None :
             return jsonify("Usuario no existe."), 404
+        elif User.query.filter_by(id=id,is_active=False).first():
+            return jsonify("Usuario ya fue baneado"), 404
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
