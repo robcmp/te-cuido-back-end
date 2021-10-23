@@ -10,7 +10,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -132,6 +132,7 @@ def register():
     name = request.json.get("name")
     last_name = request.json.get("last_name")
     password = request.json.get("password")
+    birth_date = request.json.get("birth_date")
     email = request.json.get("email")
     number_id = request.json.get("number_id")
     country = request.json.get("country")
@@ -139,7 +140,7 @@ def register():
     phone = request.json.get("phone")
     occupation = request.json.get("occupation")
     vaccinated = request.json.get("vaccinated")
-    user_type = request.json.get("user_type")
+    role = request.json.get("role")
     is_active = request.json.get("is_active")
     #payments = request.json.get("payments")
 
@@ -157,6 +158,8 @@ def register():
             return jsonify({
                 "msg": "Contraseña no válida"
             }), 400
+
+        user.birth_date= birth_date
         #Validating email
         email_regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
         if re.search(email_regex, email):
@@ -171,7 +174,7 @@ def register():
         user.phone = phone
         user.occupation = occupation
         user.vaccinated = vaccinated
-        user.user_type = user_type
+        user.role = role
         user.is_active = is_active
         #user.payments = request.json.get("payments")
 
