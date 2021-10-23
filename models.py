@@ -13,14 +13,14 @@ class User(db.Model):
     last_name = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(30), nullable=False,unique=True)
-    birth_date= db.Column(db.DateTime,nullable=False)
+    birth_date= db.Column(db.DateTime, nullable=False)
     number_id = db.Column(db.String(30), nullable=False,unique=True)
     country = db.Column(db.String(20), nullable=False)
     city = db.Column(db.String(20), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     occupation = db.Column(db.String(30), nullable=False)
     vaccinated = db.Column(db.Boolean, nullable=False)
-    role = db.Column(db.Boolean,default=False)
+    role = db.Column(db.Integer,default=False)
     is_active = db.Column(db.Boolean, default=True)
     payments = db.relationship('Payment',backref='user',lazy=True)
 
@@ -40,7 +40,7 @@ class User(db.Model):
             'phone': self.phone,
             'occupation': self.occupation,
             'vaccinated': self.vaccinated,
-            'user_type': self.user_type,
+            'role': self.role,
             'is_active': self.is_active
             #'payments': self.payments
         }
