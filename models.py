@@ -126,3 +126,4 @@ class Reserve(db.Model):
     notes= db.Column(db.String(300))
     date=db.Column(db.DateTime)
     payment_id = db.Column(db.Integer,db.ForeignKey('payment.id'))
+ 
