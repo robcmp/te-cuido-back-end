@@ -102,14 +102,14 @@ def login():
     # request.get_json(force=True)
     # print(request.json)
 
-    email = request.json.get("email")
-    password = request.json.get("password")
-    if password is None:
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    if password == "":
         return jsonify({
             "msg":"Contraseña inválida o el campo contraseña está vacío"
         }), 400
     
-    if email is None:
+    if email == "":
         return jsonify({
             "msg":"email inválido o el campo email está vacío"
         }), 400
