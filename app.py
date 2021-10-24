@@ -10,7 +10,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -143,6 +143,21 @@ def banuser(id):
             return jsonify("Usuario no existe."), 404
         elif User.query.filter_by(id=id,is_active=False).first():
             return jsonify("Usuario ya fue baneado"), 404
+            # user = User.query.filter_by(id=user.id).first()
+        user.is_active = request.json.get("is_active")
+        db.session.commit()
+
+    return jsonify(user.serialize()), 200
+
+@app.route("/unbanuser/<int:id>", methods=["PUT"])
+@cross_origin()
+def unbanuser(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is None :
+            return jsonify("Usuario no existe."), 404
+        elif User.query.filter_by(id=id,is_active=True).first():
+            return jsonify("Usuario ya fue desbaneado"), 404
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
