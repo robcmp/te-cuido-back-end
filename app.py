@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -48,9 +48,9 @@ def user():
         user.email = request.json.get("email")
         user.number_id = request.json.get("number_id")
         if User.query.filter_by(email=user.email).first():
-            return jsonify({"msg": "Correo ya utilizado"}), 460
+            return jsonify({"msg": "Correo ya utilizado"}), 404
         if User.query.filter_by(number_id=user.number_id).first():
-            return jsonify({"msg": "DNI ya utilizado"}), 461
+            return jsonify({"msg": "DNI ya utilizado"}), 404
         user.country = request.json.get("country")
         user.city = request.json.get("city")
         user.phone = request.json.get("phone")
@@ -159,6 +159,23 @@ def banuser(id):
         user = User.query.filter_by(id=id).first()
         if user is None :
             return jsonify("Usuario no existe."), 404
+        elif User.query.filter_by(id=id,is_active=False).first():
+            return jsonify("Usuario ya fue baneado"), 404
+            # user = User.query.filter_by(id=user.id).first()
+        user.is_active = request.json.get("is_active")
+        db.session.commit()
+
+    return jsonify(user.serialize()), 200
+
+@app.route("/unbanuser/<int:id>", methods=["PUT"])
+@cross_origin()
+def unbanuser(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is None :
+            return jsonify("Usuario no existe."), 404
+        elif User.query.filter_by(id=id,is_active=True).first():
+            return jsonify("Usuario ya fue desbaneado"), 404
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
