@@ -262,25 +262,17 @@ def register():
 @app.route("/delete_user/<id>", methods=["DELETE"])
 @cross_origin()
 def delete_user(id):
-     user = User()
-     user.name = request.json.get("name")
-     user.last_name = request.json.get("last_name")
-     user.password = request.json.get("password")
-     user.email = request.json.get("email")
-     user.number_id = request.json.get("number_id")
-     user.country = request.json.get("country")
-     user.city = request.json.get("city")
-     user.phone = request.json.get("phone")
-     user.occupation = request.json.get("occupation")
-     user.vaccinated = request.json.get("vaccinated")
-     user.role = request.json.get("role")
-     user.is_active = request.json.get("is_active")
-     user.payments = request.json.get("payments")
-     delete_user = delete_user.query.get(id)
-     db.session.delete(delete_user)
-     db.session.commit()
+    if id is not None:
+        user = User.query.get(id)
+        if user is None:
+            return jsonify("this a test."), 404
+        db.session.delete(user)
+        db.session.commit()
 
-     return guide_schema.jsonify(delete_user)
+     
+    return jsonify("usuario eliminado"), 200
+
+     
 
 
 
