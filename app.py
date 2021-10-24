@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from models import db, User
@@ -101,7 +102,7 @@ def userById(id):
 def login():
     # request.get_json(force=True)
     # print(request.json)
-    
+
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     if password == "":
@@ -123,8 +124,11 @@ def login():
             "msg": "El usuario no existe"
         }), 401
     elif bcrypt.check_password_hash(user.password, password):
+        access_token = create_access_token(identity=user.email)
         return jsonify({
-            "msg": "Inicio de sesión satisfactorio"
+            "msg": "Inicio de sesión satisfactorio",
+            "access_token": access_token,
+            "user": user.serialize()
         }), 200
     else:
         return jsonify({
@@ -133,6 +137,20 @@ def login():
     # create a new token with the user id inside
 
     #return jsonify(user.serialize()), 200
+
+
+@app.route("/me", methods=["POST"])
+@jwt_required()
+def me():
+    current_user = get_jwt_identity()
+    current_user_token_expires = get_jwt()["exp"]
+    return jsonify({
+        "current_user": current_user,
+        "current_user_token_expires": datetime.fromtimestamp(current_user_token_expires)
+    }), 200
+
+
+
 
 @app.route("/banuser/<int:id>", methods=["PUT"])
 @cross_origin()
@@ -199,6 +217,7 @@ def edit_user(id):
     return jsonify(user.serialize()), 200
 
 @app.route("/register", methods=["POST"])
+@cross_origin()
 def register():
     name = request.json.get("name")
     last_name = request.json.get("last_name")
@@ -256,6 +275,21 @@ def register():
         return jsonify({
             "msg": "User already exist"
         }), 400
+
+@app.route("/delete_user/<id>", methods=["DELETE"])
+@cross_origin()
+def delete_user(id):
+    if id is not None:
+        user = User.query.get(id)
+        if user is None:
+            return jsonify("this a test."), 404
+        db.session.delete(user)
+        db.session.commit()
+
+     
+    return jsonify("usuario eliminado"), 200
+
+     
 
 
 
