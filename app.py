@@ -289,8 +289,7 @@ def delete_user(id):
      
     return jsonify("usuario eliminado"), 200
 
-     
-
+    
 
 
 if __name__ == "__main__":
