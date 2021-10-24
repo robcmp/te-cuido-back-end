@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -200,6 +200,7 @@ def edit_user(id):
     return jsonify(user.serialize()), 200
 
 @app.route("/register", methods=["POST"])
+@cross_origin()
 def register():
     name = request.json.get("name")
     last_name = request.json.get("last_name")
@@ -257,6 +258,21 @@ def register():
         return jsonify({
             "msg": "User already exist"
         }), 400
+
+@app.route("/delete_user/<id>", methods=["DELETE"])
+@cross_origin()
+def delete_user(id):
+    if id is not None:
+        user = User.query.get(id)
+        if user is None:
+            return jsonify("this a test."), 404
+        db.session.delete(user)
+        db.session.commit()
+
+     
+    return jsonify("usuario eliminado"), 200
+
+     
 
 
 
