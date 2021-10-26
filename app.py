@@ -285,13 +285,40 @@ def delete_user(id):
             return jsonify("this a test."), 404
         db.session.delete(user)
         db.session.commit()
-
      
     return jsonify("usuario eliminado"), 200
 
-     
 
+@app.route("/update_user/<int:id>", methods=["PUT"])
+@cross_origin()
+def update_user(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is None :
+            return jsonify("Usuario no existe."), 404
+        
+        user.name = request.json.get("name")
+        user.last_name = request.json.get("last_name")
+        user.email = request.json.get("email")
+        #Validating email (REVISARLOS)
+        email_regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+        if re.search(email_regex, user.email):
+            email = user.email
+            user.email = email
+        else:
+            return jsonify({
+                "msg": "Correo electrónico no válido"
+            }), 400
+        user.country = request.json.get("country")
+        user.city = request.json.get("city")
+        user.phone = request.json.get("phone")
+        user.occupation = request.json.get("occupation")
+        #user.payments = request.json.get("payments")
+        
+        db.session.add(user)
+        db.session.commit()
 
+    return jsonify(user.serialize()), 200
 
 if __name__ == "__main__":
     app.run()
