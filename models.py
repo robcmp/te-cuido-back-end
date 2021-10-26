@@ -11,16 +11,17 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
     last_name = db.Column(db.String(30), nullable=False)
-    password = db.Column(db.String(30), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(30), nullable=False,unique=True)
+    birth_date= db.Column(db.DateTime, nullable=False)
     number_id = db.Column(db.String(30), nullable=False,unique=True)
     country = db.Column(db.String(20), nullable=False)
     city = db.Column(db.String(20), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     occupation = db.Column(db.String(30), nullable=False)
     vaccinated = db.Column(db.Boolean, nullable=False)
-    user_type = db.Column(db.Boolean,default=False)
-    is_active = db.Column(db.Boolean, default=False)
+    role = db.Column(db.Integer,default=False)
+    is_active = db.Column(db.Boolean, default=True)
     payments = db.relationship('Payment',backref='user',lazy=True)
 
     def __repr__(self):
@@ -32,13 +33,14 @@ class User(db.Model):
             'name': self.name,
             'last_name': self.last_name,
             'email': self.email,
+            'birth_date':self.birth_date,
             'number_id': self.number_id,
             'country': self.country,
             'city': self.city,
             'phone': self.phone,
             'occupation': self.occupation,
             'vaccinated': self.vaccinated,
-            'user_type': self.user_type,
+            'role': self.role,
             'is_active': self.is_active
             #'payments': self.payments
         }
@@ -124,3 +126,4 @@ class Reserve(db.Model):
     notes= db.Column(db.String(300))
     date=db.Column(db.DateTime)
     payment_id = db.Column(db.Integer,db.ForeignKey('payment.id'))
+ 
