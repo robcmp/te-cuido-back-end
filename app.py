@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -158,9 +158,11 @@ def banuser(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is None :
-            return jsonify("Usuario no existe."), 404
+            return jsonify({
+                "msg": "User doesn't exist"
+            }), 400
         elif User.query.filter_by(id=id,is_active=False).first():
-            return jsonify("Usuario ya fue baneado"), 404
+            return jsonify("Usuario ya fue baneado"), 400
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
@@ -173,9 +175,13 @@ def unbanuser(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is None :
-            return jsonify("Usuario no existe."), 404
+            return jsonify({
+                "msg": "User doesn't exist"
+            }), 400
         elif User.query.filter_by(id=id,is_active=True).first():
-            return jsonify("Usuario ya fue desbaneado"), 404
+            return jsonify({
+                "msg": "User already unbanned"
+            }), 400
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
@@ -189,11 +195,11 @@ def edit_user(id):
         if id is not None:
             user = User.query.get(id)
             if user is None:
-                return jsonify('Missing id parameter in route'), 404
+                return jsonify('Missing id parameter in route'), 400
             else:
                 return jsonify(user.serialize()), 200
         else:
-            return jsonify('Missing id parameter in route'), 404
+            return jsonify('Missing id parameter in route'), 400
     else:
         user = User()
         # request.get_json(force=True) 
@@ -245,7 +251,7 @@ def register():
             user.password = password_hash
         else:
             return jsonify({
-                "msg": "Contraseña no válida"
+                "msg": "Invalid password"
             }), 400
 
         user.birth_date= birth_date
@@ -255,7 +261,7 @@ def register():
             user.email = email
         else:
             return jsonify({
-                "msg": "Correo electrónico no válido"
+                "msg": "Invalid email"
             }), 400
         user.number_id = number_id
         user.country = country
@@ -282,11 +288,15 @@ def delete_user(id):
     if id is not None:
         user = User.query.get(id)
         if user is None:
-            return jsonify("this a test."), 404
+            return jsonify({
+            "msg": "User doesn't exist."
+        }), 404
         db.session.delete(user)
         db.session.commit()
      
-    return jsonify("usuario eliminado"), 200
+    return jsonify({
+            "msg": "User deleted"
+        }), 200
 
 
 @app.route("/update_user/<int:id>", methods=["PUT"])

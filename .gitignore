@@ -1,4 +1,4 @@
 Pipfile
 Pipfile.lock
-migrations/
+/migrations
 /_pycache_
