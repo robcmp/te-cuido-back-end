@@ -158,9 +158,11 @@ def banuser(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is None :
-            return jsonify("Usuario no existe."), 404
+            return jsonify({
+                "msg": "User doesn't exist"
+            }), 400
         elif User.query.filter_by(id=id,is_active=False).first():
-            return jsonify("Usuario ya fue baneado"), 404
+            return jsonify("Usuario ya fue baneado"), 400
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
@@ -173,9 +175,13 @@ def unbanuser(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is None :
-            return jsonify("Usuario no existe."), 404
+            return jsonify({
+                "msg": "User doesn't exist"
+            }), 400
         elif User.query.filter_by(id=id,is_active=True).first():
-            return jsonify("Usuario ya fue desbaneado"), 404
+            return jsonify({
+                "msg": "User already unbanned"
+            }), 400
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
@@ -189,11 +195,11 @@ def edit_user(id):
         if id is not None:
             user = User.query.get(id)
             if user is None:
-                return jsonify('Missing id parameter in route'), 404
+                return jsonify('Missing id parameter in route'), 400
             else:
                 return jsonify(user.serialize()), 200
         else:
-            return jsonify('Missing id parameter in route'), 404
+            return jsonify('Missing id parameter in route'), 400
     else:
         user = User()
         # request.get_json(force=True) 
@@ -245,7 +251,7 @@ def register():
             user.password = password_hash
         else:
             return jsonify({
-                "msg": "Contraseña no válida"
+                "msg": "Invalid password"
             }), 400
 
         user.birth_date= birth_date
@@ -255,7 +261,7 @@ def register():
             user.email = email
         else:
             return jsonify({
-                "msg": "Correo electrónico no válido"
+                "msg": "Invalid email"
             }), 400
         user.number_id = number_id
         user.country = country
@@ -282,16 +288,47 @@ def delete_user(id):
     if id is not None:
         user = User.query.get(id)
         if user is None:
-            return jsonify("this a test."), 404
+            return jsonify({
+            "msg": "User doesn't exist."
+        }), 404
         db.session.delete(user)
         db.session.commit()
-
      
-    return jsonify("usuario eliminado"), 200
+    return jsonify({
+            "msg": "User deleted"
+        }), 200
 
-     
 
+@app.route("/update_user/<int:id>", methods=["PUT"])
+@cross_origin()
+def update_user(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is None :
+            return jsonify("Usuario no existe."), 404
+        
+        user.name = request.json.get("name")
+        user.last_name = request.json.get("last_name")
+        user.email = request.json.get("email")
+        #Validating email (REVISARLOS)
+        email_regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+        if re.search(email_regex, user.email):
+            email = user.email
+            user.email = email
+        else:
+            return jsonify({
+                "msg": "Correo electrónico no válido"
+            }), 400
+        user.country = request.json.get("country")
+        user.city = request.json.get("city")
+        user.phone = request.json.get("phone")
+        user.occupation = request.json.get("occupation")
+        #user.payments = request.json.get("payments")
+        
+        db.session.add(user)
+        db.session.commit()
 
+    return jsonify(user.serialize()), 200
 
 if __name__ == "__main__":
     app.run()
