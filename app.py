@@ -334,8 +334,16 @@ def update_user(id):
 @cross_origin()
 def services(id):
     if request.method=="GET":
+         user = User.query.filter_by(id=id).first()
+         if user is None :
+            return jsonify("User doesn't exist"), 404
          if id is not None:
-            service= Service.query.get(id)
+            service= Service.query.filter_by(user_id=id)
+            service = list(map(lambda x: x.serialize(),service))
+            if service is None:
+                return jsonify({"msg":"There are no services for this user"}),404
+            else:
+                return jsonify(service),200
          else:
              return jsonify({"msg":"Missing id parameter"}),404
 
