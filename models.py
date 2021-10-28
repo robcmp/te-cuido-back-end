@@ -75,7 +75,7 @@ class Service(db.Model):
             'age_start': self.age_start,
             'age_end': self.age_end,
             'notes': self.notes,
-            'gender_ser': self.gender
+            'gender': self.gender
         }
 
 #Helper to made Many to Many Relationship with User and Document
