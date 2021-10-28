@@ -358,7 +358,7 @@ def services(id):
             service.age_start=request.json.get("age_start")
             service.age_end=request.json.get("age_end")
             service.notes=request.json.get("notes")
-            service.gender_ser=request.json.get("gender_ser")
+            service.gender=request.json.get("gender")
             service.user_id=id
         
             db.session.add(service)
