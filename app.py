@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import db, User
+from models import Service, db, User
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -298,6 +298,7 @@ def delete_user(id):
             "msg": "User deleted"
         }), 200
 
+    
 
 @app.route("/update_user/<int:id>", methods=["PUT"])
 @cross_origin()
@@ -329,6 +330,23 @@ def update_user(id):
         db.session.commit()
 
     return jsonify(user.serialize()), 200
+
+@app.route("/delete_publication/<int:id>", methods=["DELETE"])
+@cross_origin()
+def delete_publication(id):
+    if id is not None:
+        service = Service.query.get(id)
+        if service is None:
+            return jsonify({
+            "msg": "Service doesn't exist."
+        }), 404
+        db.session.delete(service)
+        db.session.commit()
+     
+    return jsonify({
+            "msg": "Service deleted"
+        }), 200
+
 
 if __name__ == "__main__":
     app.run()
