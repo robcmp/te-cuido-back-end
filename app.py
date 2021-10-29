@@ -366,6 +366,7 @@ def services(id):
             db.session.commit()
 
         return jsonify(service.serialize()),200
+        
 @app.route("/delete_publication/<int:id>", methods=["DELETE"])
 @cross_origin()
 def delete_publication(id):
