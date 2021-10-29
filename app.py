@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -366,6 +366,7 @@ def services(id):
             db.session.commit()
 
         return jsonify(service.serialize()),200
+
 @app.route("/delete_publication/<int:id>", methods=["DELETE"])
 @cross_origin()
 def delete_publication(id):
@@ -382,6 +383,13 @@ def delete_publication(id):
             "msg": "Service deleted"
         }), 200
 
+@app.route("/list_services", methods=["GET"])
+@cross_origin()
+def list_services():
+    if request.method == "GET":
+        services = Service.query.all()
+        services = list(map(lambda x: x.serialize(), services))
+        return jsonify(services)
 
 if __name__ == "__main__":
     app.run()
