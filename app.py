@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -331,6 +331,41 @@ def update_user(id):
 
     return jsonify(user.serialize()), 200
 
+@app.route("/services/<int:id>", methods=["POST","GET"])
+@cross_origin()
+def services(id):
+    if request.method=="GET":
+         user = User.query.filter_by(id=id).first()
+         if user is None :
+            return jsonify("User doesn't exist"), 404
+         if id is not None:
+            service= Service.query.filter_by(user_id=id)
+            service = list(map(lambda x: x.serialize(),service))
+            if service is None:
+                return jsonify({"msg":"There are no services for this user"}),404
+            else:
+                return jsonify(service),200
+         else:
+             return jsonify({"msg":"Missing id parameter"}),404
+
+    else:
+        if id is not None:
+            user = User.query.filter_by(id=id).first()
+            if user is None :
+                return jsonify("User doesn't exist"), 404
+            service = Service()
+            service.date_init = request.json.get("date_init")
+            service.date_end=request.json.get("date_end")
+            service.age_start=request.json.get("age_start")
+            service.age_end=request.json.get("age_end")
+            service.notes=request.json.get("notes")
+            service.gender=request.json.get("gender")
+            service.user_id=id
+        
+            db.session.add(service)
+            db.session.commit()
+
+        return jsonify(service.serialize()),200
 @app.route("/delete_publication/<int:id>", methods=["DELETE"])
 @cross_origin()
 def delete_publication(id):
