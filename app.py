@@ -298,6 +298,7 @@ def delete_user(id):
             "msg": "User deleted"
         }), 200
 
+    
 
 @app.route("/update_user/<int:id>", methods=["PUT"])
 @cross_origin()
@@ -365,6 +366,21 @@ def services(id):
             db.session.commit()
 
         return jsonify(service.serialize()),200
+@app.route("/delete_publication/<int:id>", methods=["DELETE"])
+@cross_origin()
+def delete_publication(id):
+    if id is not None:
+        service = Service.query.get(id)
+        if service is None:
+            return jsonify({
+            "msg": "Service doesn't exist."
+        }), 404
+        db.session.delete(service)
+        db.session.commit()
+     
+    return jsonify({
+            "msg": "Service deleted"
+        }), 200
 
 
 if __name__ == "__main__":
