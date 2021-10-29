@@ -55,12 +55,13 @@ class User(db.Model):
 class Service(db.Model):
     __tablename__ = 'service'
     id = db.Column(db.Integer, primary_key=True)
+    gender = db.Column(db.Integer,nullable=False)
     date_init = db.Column(db.DateTime, nullable=False)
     date_end = db.Column(db.DateTime, nullable=False)
     age_start = db.Column(db.Integer, nullable=False)
     age_end = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.String(300), nullable=False)
-    gender = db.Column(db.Integer,nullable=False)
+    price=db.Column(db.Numeric(10,2))
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship("User")
 
