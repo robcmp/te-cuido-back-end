@@ -70,6 +70,7 @@ class Service(db.Model):
     def serialize(self):
         return {
             'id': self.id,
+            'user_id': self.user_id,
             'date_init': self.date_init,
             'date_end': self.date_end,
             'age_start': self.age_start,
