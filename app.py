@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import db, User
+from models import Service, db, User
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
@@ -298,6 +298,7 @@ def delete_user(id):
             "msg": "User deleted"
         }), 200
 
+    
 
 @app.route("/update_user/<int:id>", methods=["PUT"])
 @cross_origin()
@@ -329,6 +330,58 @@ def update_user(id):
         db.session.commit()
 
     return jsonify(user.serialize()), 200
+
+@app.route("/services/<int:id>", methods=["POST","GET"])
+@cross_origin()
+def services(id):
+    if request.method=="GET":
+         user = User.query.filter_by(id=id).first()
+         if user is None :
+            return jsonify("User doesn't exist"), 404
+         if id is not None:
+            service= Service.query.filter_by(user_id=id)
+            service = list(map(lambda x: x.serialize(),service))
+            if service is None:
+                return jsonify({"msg":"There are no services for this user"}),404
+            else:
+                return jsonify(service),200
+         else:
+             return jsonify({"msg":"Missing id parameter"}),404
+
+    else:
+        if id is not None:
+            user = User.query.filter_by(id=id).first()
+            if user is None :
+                return jsonify("User doesn't exist"), 404
+            service = Service()
+            service.date_init = request.json.get("date_init")
+            service.date_end=request.json.get("date_end")
+            service.age_start=request.json.get("age_start")
+            service.age_end=request.json.get("age_end")
+            service.notes=request.json.get("notes")
+            service.gender=request.json.get("gender")
+            service.user_id=id
+        
+            db.session.add(service)
+            db.session.commit()
+
+        return jsonify(service.serialize()),200
+@app.route("/delete_publication/<int:id>", methods=["DELETE"])
+@cross_origin()
+def delete_publication(id):
+    if id is not None:
+        service = Service.query.get(id)
+        if service is None:
+            return jsonify({
+            "msg": "Service doesn't exist."
+        }), 404
+        db.session.delete(service)
+        db.session.commit()
+     
+    return jsonify({
+            "msg": "Service deleted"
+        }), 200
+
 
 if __name__ == "__main__":
     app.run()
