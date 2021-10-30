@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey, Table, Integer,Enum
-import enum
+from sqlalchemy import ForeignKey, Table, Integer
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.orm import backref, relationship
 db = SQLAlchemy()
@@ -52,10 +51,6 @@ class User(db.Model):
         }
 
 #Enum class gender to be set in class Service 
-class gender(enum.Enum):
-    FEMALE = 'Female'
-    MALE = 'Male'
-
 
 class Service(db.Model):
     __tablename__ = 'service'
@@ -65,7 +60,7 @@ class Service(db.Model):
     age_start = db.Column(db.Integer, nullable=False)
     age_end = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.String(300), nullable=False)
-    gender_ser = db.Column(db.Enum(gender))
+    gender = db.Column(db.Integer,nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship("User")
 
@@ -75,11 +70,13 @@ class Service(db.Model):
     def serialize(self):
         return {
             'id': self.id,
+            'user_id': self.user_id,
             'date_init': self.date_init,
             'date_end': self.date_end,
             'age_start': self.age_start,
             'age_end': self.age_end,
-            'notes': self.notes
+            'notes': self.notes,
+            'gender': self.gender
         }
 
 #Helper to made Many to Many Relationship with User and Document
@@ -121,7 +118,7 @@ class Reserve(db.Model):
     __tablename__ = 'reserve'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
-    gender_res = db.Column(db.Enum(gender))
+    gender = db.Column(db.Integer,nullable=False)
     age = db.Column(db.Integer)
     notes= db.Column(db.String(300))
     date=db.Column(db.DateTime)
