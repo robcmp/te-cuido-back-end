@@ -383,13 +383,18 @@ def delete_publication(id):
             "msg": "Service deleted"
         }), 200
 
-@app.route("/list_services", methods=["GET"])
+@app.route("/list_services/", methods=["GET"])
 @cross_origin()
 def list_services():
     if request.method == "GET":
         services = Service.query.all()
         services = list(map(lambda x: x.serialize(), services))
         return jsonify(services)
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run()
