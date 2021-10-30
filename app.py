@@ -391,8 +391,13 @@ def list_services():
         services = list(map(lambda x: x.serialize(), services))
         return jsonify(services)
 
-
-
+@app.route("/service_publication/<int:user_id>", methods=["GET"])
+@cross_origin()
+def service_publication(user_id):
+    if request.method == "GET":
+        services = Service.query.filter_by(user_id=user_id).all()
+        services = list(map(lambda x: x.serialize(), services))
+        return jsonify(services)
 
 
 
