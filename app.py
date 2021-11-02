@@ -399,6 +399,21 @@ def service_publication(user_id):
         services = list(map(lambda x: x.serialize(), services))
         return jsonify(services)
 
+@app.route("/delete_services_by_id/<int:id>", methods=["DELETE"])
+@cross_origin()
+def delete_servicios_by_id(id):
+    if id is not None:
+        service = Service.query.get(id)
+        if service is None:
+            return jsonify({
+            "msg": "Service doesn't exist."
+        }), 404
+        db.session.delete(service)
+        db.session.commit()
+     
+    return jsonify({
+            "msg": "Service deleted"
+        }), 200
 
 
 if __name__ == "__main__":
