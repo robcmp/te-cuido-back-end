@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido' 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -390,6 +390,31 @@ def list_services():
         services = Service.query.all()
         services = list(map(lambda x: x.serialize(), services))
         return jsonify(services)
+
+@app.route("/service_publication/<int:user_id>", methods=["GET"])
+@cross_origin()
+def service_publication(user_id):
+    if request.method == "GET":
+        services = Service.query.filter_by(user_id=user_id).all()
+        services = list(map(lambda x: x.serialize(), services))
+        return jsonify(services)
+
+@app.route("/delete_services_by_id/<int:id>", methods=["DELETE"])
+@cross_origin()
+def delete_servicios_by_id(id):
+    if id is not None:
+        service = Service.query.get(id)
+        if service is None:
+            return jsonify({
+            "msg": "Service doesn't exist."
+        }), 404
+        db.session.delete(service)
+        db.session.commit()
+     
+    return jsonify({
+            "msg": "Service deleted"
+        }), 200
+
 
 if __name__ == "__main__":
     app.run()
