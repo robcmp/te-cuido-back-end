@@ -383,7 +383,7 @@ def delete_publication(id):
             "msg": "Service deleted"
         }), 200
 
-@app.route("/list_services/", methods=["GET"])
+@app.route("/list_services", methods=["GET"])
 @cross_origin()
 def list_services():
     if request.method == "GET":
