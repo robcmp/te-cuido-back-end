@@ -92,7 +92,7 @@ class Document(db.Model):
     doc_type = db.Column(db.Integer)
     doc_description= db.Column(db.String(20))
     image = db.Column(db.LargeBinary)
-    users = db.relationship('User',secondary=docs,backref=db.backref('users',lazy=True))
+    users = db.relationship('User',secondary=docs,backref=db.backref('user',lazy=True))
 
     def __repr__(self):
         return "<Document %r>" % self.id
