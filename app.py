@@ -360,6 +360,7 @@ def services(id):
             service.age_end=request.json.get("age_end")
             service.notes=request.json.get("notes")
             service.gender=request.json.get("gender")
+            service.price=request.json.get("price")
             service.user_id=id
         
             db.session.add(service)
