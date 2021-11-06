@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import Service, db, User
+from models import Service, db, User, Reserve
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
@@ -415,6 +415,42 @@ def delete_servicios_by_id(id):
     return jsonify({
             "msg": "Service deleted"
         }), 200
+    
+@app.route("/reserve/<int:id>", methods=["GET","POST"])
+@cross_origin()
+def reserve(id):
+    if request.method=="GET":
+         reserve = Reserve.query.filter_by(id=id).first()
+         if reserve is None :
+            return jsonify("User doesn't exist"), 404
+         if id is not None:
+            reserve= Reserve.query.filter_by(user_id=id)
+            reserve = list(map(lambda x: x.serialize(),reserve))
+            if reserve is None:
+                return jsonify({"msg":"There are no services for this user"}),404
+            else:
+                return jsonify(reserve),200
+         else:
+             return jsonify({"msg":"Missing id parameter"}),404
+
+    else:
+        if id is not None:
+            service = Service.query.filter_by(id=id).first()
+            if service is None :
+                return jsonify("Service doesn't exist"), 404
+            reserve = Reserve()
+            reserve.name = request.json.get("name")
+            reserve.gender=request.json.get("gender")
+            reserve.age=request.json.get("age")
+            reserve.notes=request.json.get("notes")
+            reserve.date=request.json.get("dates")
+            reserve.service_id=id
+        
+            db.session.add(reserve)
+            db.session.commit()
+
+        return jsonify(reserve.serialize()),200
+
 
 
 if __name__ == "__main__":
