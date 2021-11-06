@@ -62,8 +62,10 @@ class Service(db.Model):
     age_end = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.String(300), nullable=False)
     price=db.Column(db.Numeric(10,2))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    is_reserved=db.Column(db.Boolean, default = False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = relationship("User")
+    reserve_id = relationship("Reserve", backref="service", uselist=False)
 
     def __repr__(self):
         return "<Service %r>" % self.id
@@ -77,7 +79,8 @@ class Service(db.Model):
             'age_start': self.age_start,
             'age_end': self.age_end,
             'notes': self.notes,
-            'gender': self.gender
+            'gender': self.gender,
+            'price':self.price
         }
 
 #Helper to made Many to Many Relationship with User and Document
@@ -92,7 +95,7 @@ class Document(db.Model):
     doc_type = db.Column(db.Integer)
     doc_description= db.Column(db.String(20))
     image = db.Column(db.LargeBinary)
-    users = db.relationship('User',secondary=docs,backref=db.backref('users',lazy=True))
+    users = db.relationship('User',secondary=docs,backref=db.backref('user',lazy=True))
 
     def __repr__(self):
         return "<Document %r>" % self.id
@@ -124,4 +127,18 @@ class Reserve(db.Model):
     notes= db.Column(db.String(300))
     date=db.Column(db.DateTime)
     payment_id = db.Column(db.Integer,db.ForeignKey('payment.id'))
+    service_id=db.Column(db.Integer,db.ForeignKey('service.id'))
+
+    def __repr__(self):
+        return "<Reserve %r>" % self.id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'gender': self.gender,
+            'notes': self.notes,
+            'date': self.date,
+            'service_id': self.service_id
+        }
  

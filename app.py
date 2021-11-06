@@ -360,6 +360,7 @@ def services(id):
             service.age_end=request.json.get("age_end")
             service.notes=request.json.get("notes")
             service.gender=request.json.get("gender")
+            service.price=request.json.get("price")
             service.user_id=id
         
             db.session.add(service)
@@ -390,6 +391,31 @@ def list_services():
         services = Service.query.all()
         services = list(map(lambda x: x.serialize(), services))
         return jsonify(services)
+
+@app.route("/service_publication/<int:user_id>", methods=["GET"])
+@cross_origin()
+def service_publication(user_id):
+    if request.method == "GET":
+        services = Service.query.filter_by(user_id=user_id).all()
+        services = list(map(lambda x: x.serialize(), services))
+        return jsonify(services)
+
+@app.route("/delete_services_by_id/<int:id>", methods=["DELETE"])
+@cross_origin()
+def delete_servicios_by_id(id):
+    if id is not None:
+        service = Service.query.get(id)
+        if service is None:
+            return jsonify({
+            "msg": "Service doesn't exist."
+        }), 404
+        db.session.delete(service)
+        db.session.commit()
+     
+    return jsonify({
+            "msg": "Service deleted"
+        }), 200
+
 
 if __name__ == "__main__":
     app.run()
