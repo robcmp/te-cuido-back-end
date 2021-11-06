@@ -445,7 +445,6 @@ def reserve(id):
             reserve.notes=request.json.get("notes")
             reserve.date=request.json.get("dates")
             reserve.service_id=id
-        
             db.session.add(reserve)
             db.session.commit()
 
