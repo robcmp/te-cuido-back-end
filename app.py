@@ -443,7 +443,7 @@ def reserve(id):
             reserve.gender=request.json.get("gender")
             reserve.age=request.json.get("age")
             reserve.notes=request.json.get("notes")
-            reserve.date=request.json.get("dates")
+            reserve.date=request.json.get("date")
             reserve.service_id=id
             db.session.add(reserve)
             db.session.commit()
