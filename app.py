@@ -28,7 +28,7 @@ bcrypt = Bcrypt(app)
 
 @app.route('/')
 def home():
-    return jsonify('Creando Back-End Te-Cuido')
+    return jsonify('Creating Back-End Te-Cuido')
 
 @app.route("/user", methods=["POST", "GET"])
 @cross_origin()
@@ -48,9 +48,9 @@ def user():
         user.email = request.json.get("email")
         user.number_id = request.json.get("number_id")
         if User.query.filter_by(email=user.email).first():
-            return jsonify({"msg": "Correo ya utilizado"}), 404
+            return jsonify({"msg": "Email already used"}), 404
         if User.query.filter_by(number_id=user.number_id).first():
-            return jsonify({"msg": "DNI ya utilizado"}), 404
+            return jsonify({"msg": "DNI already used"}), 404
         user.country = request.json.get("country")
         user.city = request.json.get("city")
         user.phone = request.json.get("phone")
@@ -107,12 +107,12 @@ def login():
     password = request.json.get("password", None)
     if password == "":
         return jsonify({
-            "msg":"Contraseña inválida o el campo contraseña está vacío"
+            "msg":"Invalid password or password field is empty"
         }), 400
     
     if email == "":
         return jsonify({
-            "msg":"email inválido o el campo email está vacío"
+            "msg":"Invalid email or email field is empty"
         }), 400
     
     # Query your database for username and password
@@ -121,18 +121,18 @@ def login():
     if user is None:
         # the user was not found on the database
         return jsonify({
-            "msg": "El usuario no existe"
+            "msg": "user doesn't exist"
         }), 401
     elif bcrypt.check_password_hash(user.password, password):
         access_token = create_access_token(identity=user.email)
         return jsonify({
-            "msg": "Inicio de sesión satisfactorio",
+            "msg": "Successful login",
             "access_token": access_token,
             "user": user.serialize()
         }), 200
     else:
         return jsonify({
-            "msg":"Credenciales de acceso erróneas"
+            "msg":"Incorrect access credentials"
         }), 400
     # create a new token with the user id inside
 
@@ -162,7 +162,7 @@ def banuser(id):
                 "msg": "User doesn't exist"
             }), 400
         elif User.query.filter_by(id=id,is_active=False).first():
-            return jsonify("Usuario ya fue baneado"), 400
+            return jsonify("User already banned"), 400
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
@@ -212,10 +212,7 @@ def edit_user(id):
         user.city = request.json.get("city")
         user.phone = request.json.get("phone")
         user.occupation = request.json.get("occupation")
-        #user.vaccinated = request.json.get("vaccinated")
-        #user.user_type = request.json.get("user_type")
-        #user.is_active = request.json.get("is_active")
-        #user.payments = request.json.get("payments")
+        
     
         db.session.add(user)
         db.session.commit()
@@ -306,7 +303,7 @@ def update_user(id):
     if id is not None:
         user = User.query.filter_by(id=id).first()
         if user is None :
-            return jsonify("Usuario no existe."), 404
+            return jsonify("User doesn't exist."), 404
         
         user.name = request.json.get("name")
         user.last_name = request.json.get("last_name")
@@ -318,7 +315,7 @@ def update_user(id):
             user.email = email
         else:
             return jsonify({
-                "msg": "Correo electrónico no válido"
+                "msg": "invalid email"
             }), 400
         user.country = request.json.get("country")
         user.city = request.json.get("city")
@@ -347,7 +344,6 @@ def services(id):
                 return jsonify(service),200
          else:
              return jsonify({"msg":"Missing id parameter"}),404
-
     else:
         if id is not None:
             user = User.query.filter_by(id=id).first()
@@ -415,7 +411,7 @@ def delete_servicios_by_id(id):
     return jsonify({
             "msg": "Service deleted"
         }), 200
-    
+
 @app.route("/reserve/<int:id>", methods=["GET","POST"])
 @cross_origin()
 def reserve(id):
@@ -437,17 +433,21 @@ def reserve(id):
         if id is not None:
             service = Service.query.filter_by(id=id).first()
             if service is None :
-                return jsonify("Service doesn't exist"), 404
+                return jsonify("Service doesn't exist"), 404           
+            service_date_start=service.date_init
+            service_date_end=service.date_end
+            service.is_reserved=True
             reserve = Reserve()
             reserve.name = request.json.get("name")
             reserve.gender=request.json.get("gender")
             reserve.age=request.json.get("age")
             reserve.notes=request.json.get("notes")
-            reserve.date=request.json.get("date")
+            reserve.date_start=service_date_start
+            reserve.date_end=service_date_end
             reserve.service_id=id
             db.session.add(reserve)
             db.session.commit()
-
+           
         return jsonify(reserve.serialize()),200
 
 
