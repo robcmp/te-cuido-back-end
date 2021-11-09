@@ -344,7 +344,6 @@ def services(id):
                 return jsonify(service),200
          else:
              return jsonify({"msg":"Missing id parameter"}),404
-
     else:
         if id is not None:
             user = User.query.filter_by(id=id).first()
@@ -412,7 +411,7 @@ def delete_servicios_by_id(id):
     return jsonify({
             "msg": "Service deleted"
         }), 200
-    
+
 @app.route("/reserve/<int:id>", methods=["GET","POST"])
 @cross_origin()
 def reserve(id):
@@ -434,17 +433,21 @@ def reserve(id):
         if id is not None:
             service = Service.query.filter_by(id=id).first()
             if service is None :
-                return jsonify("Service doesn't exist"), 404
+                return jsonify("Service doesn't exist"), 404           
+            service_date_start=service.date_init
+            service_date_end=service.date_end
+            service.is_reserved=True
             reserve = Reserve()
             reserve.name = request.json.get("name")
             reserve.gender=request.json.get("gender")
             reserve.age=request.json.get("age")
             reserve.notes=request.json.get("notes")
-            reserve.date=request.json.get("dates")
+            reserve.date_start=service_date_start
+            reserve.date_end=service_date_end
             reserve.service_id=id
             db.session.add(reserve)
             db.session.commit()
-
+           
         return jsonify(reserve.serialize()),200
 
 

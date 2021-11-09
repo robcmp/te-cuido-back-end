@@ -80,7 +80,8 @@ class Service(db.Model):
             'age_end': self.age_end,
             'notes': self.notes,
             'gender': self.gender,
-            'price':self.price
+            'price':self.price,
+            'is_reserved':self.is_reserved
         }
 
 #Helper to made Many to Many Relationship with User and Document
@@ -125,7 +126,8 @@ class Reserve(db.Model):
     gender = db.Column(db.Integer,nullable=False)
     age = db.Column(db.Integer)
     notes= db.Column(db.String(300))
-    date=db.Column(db.DateTime)
+    date_start=db.Column(db.DateTime)
+    date_end=db.Column(db.DateTime)
     payment_id = db.Column(db.Integer,db.ForeignKey('payment.id'))
     service_id=db.Column(db.Integer,db.ForeignKey('service.id'))
 
@@ -138,7 +140,8 @@ class Reserve(db.Model):
             'name': self.name,
             'gender': self.gender,
             'notes': self.notes,
-            'date': self.date,
+            'date_start': self.date_start,
+            'date_end': self.date_end,
             'service_id': self.service_id
         }
  
