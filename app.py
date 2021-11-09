@@ -384,9 +384,11 @@ def delete_publication(id):
 @cross_origin()
 def list_services():
     if request.method == "GET":
-        services = Service.query.all()
+        services = Service.query.filter_by(is_reserved=False).all()
+        if services is None :
+            return jsonify("services doesn't exist"), 404
         services = list(map(lambda x: x.serialize(), services))
-        return jsonify(services)
+        return jsonify(services),200
 
 @app.route("/service_publication/<int:user_id>", methods=["GET"])
 @cross_origin()
@@ -395,6 +397,7 @@ def service_publication(user_id):
         services = Service.query.filter_by(user_id=user_id).all()
         services = list(map(lambda x: x.serialize(), services))
         return jsonify(services)
+
 
 @app.route("/delete_services_by_id/<int:id>", methods=["DELETE"])
 @cross_origin()
