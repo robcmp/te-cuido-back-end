@@ -78,8 +78,7 @@ class Service(db.Model):
             'age_end': self.age_end,
             'notes': self.notes,
             'gender': self.gender,
-            'price': self.price,
-            'is_reserved': self.is_reserved
+            'price': self.price
         }
 
 
