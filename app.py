@@ -455,6 +455,8 @@ def reserve(id):
             reserve.notes = request.json.get("notes")
             reserve.date_start = service_date_start
             reserve.date_end = service_date_end
+            reserve.carer_id = request.json.get("carer_id")
+            reserve.client_id = request.json.get("client_id")
             reserve.service_id = id
             db.session.add(reserve)
             db.session.commit()
@@ -472,6 +474,35 @@ def reserved_service(id):
             return jsonify({"msg", "Services doesn't exist"}), 404
         services = list(map(lambda x: x.serialize(), services))
         return jsonify(services), 200
+    else:
+        if id is not None:
+            service = Service.query.filter_by(id=id, is_reserved=True).all()
+
+
+@app.route('/reservations/carer/<int:id>', methods=["GET", "POST"])
+@cross_origin()
+def reservations_carer(id):
+    if request.method == "GET":
+
+        reserve = Reserve.query.filter_by(carer_id=id).all()
+        if reserve is None:
+            return jsonify({"msg", "Services doesn't exist"}), 404
+        reservations = list(map(lambda x: x.serialize(), reserve))
+        return jsonify(reservations), 200
+    else:
+        if id is not None:
+            service = Service.query.filter_by(id=id, is_reserved=True).all()
+
+
+@app.route('/reservations/client/<int:id>', methods=["GET", "POST"])
+@cross_origin()
+def reservations_client(id):
+    if request.method == "GET":
+        reserve = Reserve.query.filter_by(client_id=id).all()
+        if reserve is None:
+            return jsonify({"msg", "Services doesn't exist"}), 404
+        reservations = list(map(lambda x: x.serialize(), reserve))
+        return jsonify(reservations), 200
     else:
         if id is not None:
             service = Service.query.filter_by(id=id, is_reserved=True).all()
