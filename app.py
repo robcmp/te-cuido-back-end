@@ -496,6 +496,7 @@ if __name__ == "__main__":
 
 
 
+-
 
 
 
@@ -505,4 +506,38 @@ if __name__ == "__main__":
 
 
 
+@app.route("/reserve_confirmation/<int:id>", methods=["PUT"])
+@cross_origin()/*
+def reserve_confirmation(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is None:
+            return jsonify({
+                "msg": "User doesn't exist"
+            }), 400
+        elif User.query.filter_by(id=id, is_active=False).first():
+            return jsonify("User already reserve_confirmation"), 400
+            # user = User.query.filter_by(id=user.id).first()
+        user.is_active = request.json.get("is_active")
+        db.session.commit()
 
+    return jsonify(user.serialize()), 200
+
+
+
+@app.route("/reserve_rejection/<int:id>", methods=["PUT"])
+@cross_origin()
+def reserve_rejection(id):
+    if id is not None:
+        user = User.query.filter_by(id=id).first()
+        if user is None:
+            return jsonify({
+                "msg": "User doesn't exist"
+            }), 400
+        elif User.query.filter_by(id=id, is_active=False).first():
+            return jsonify("User already banned"), 400
+            # user = User.query.filter_by(id=user.id).first()
+        user.is_active = request.json.get("is_active")
+        db.session.commit()
+
+    return jsonify(user.serialize()), 200
