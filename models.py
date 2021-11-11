@@ -22,7 +22,6 @@ class User(db.Model):
     role = db.Column(db.Integer, default=False)
     is_active = db.Column(db.Boolean, default=True)
     payments = db.relationship('Payment', backref='user', lazy=True)
-    reserve = db.relationship('Reserve', backref='user', lazy=True)
 
     def __repr__(self):
         return "<User %r>" % self.id
@@ -62,9 +61,8 @@ class Service(db.Model):
     age_end = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.String(300), nullable=False)
     price = db.Column(db.Numeric(10, 2))
-    is_reserved = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = relationship("User")
+    user = db.relationship("User")
     reserve_id = db.relationship("Reserve", backref="service", uselist=False)
 
     def __repr__(self):
@@ -134,10 +132,13 @@ class Reserve(db.Model):
     notes = db.Column(db.String(300))
     date_start = db.Column(db.DateTime)
     date_end = db.Column(db.DateTime)
+    status = db.Column(db.String(10), nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     service_id = db.Column(db.Integer, db.ForeignKey('service.id'))
-    client_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    carer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    client_id = Column(Integer, ForeignKey("user.id"))
+    carer_id = Column(Integer, ForeignKey("user.id"))
+    client = relationship("User", foreign_keys=[client_id])
+    carer = relationship("User", foreign_keys=[carer_id])
 
     def __repr__(self):
         return "<Reserve %r>" % self.id
