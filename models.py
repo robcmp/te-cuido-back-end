@@ -65,7 +65,7 @@ class Service(db.Model):
     is_reserved = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = relationship("User")
-    reserve_id = relationship("Reserve", backref="service", uselist=False)
+    reserve_id = db.relationship("Reserve", backref="service", uselist=False)
 
     def __repr__(self):
         return "<Service %r>" % self.id
