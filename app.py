@@ -10,7 +10,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -509,6 +509,7 @@ def reservations_client(id):
         if id is not None:
             service = Service.query.filter_by(id=id, is_reserved=True).all()
 
+
 @app.route("/reserve_confirmation/<int:id>", methods=["PUT"])
 @cross_origin()
 def reserve_confirmation(id):
@@ -517,13 +518,12 @@ def reserve_confirmation(id):
         if reserve is None:
             return jsonify({
                 "msg": "Reserve doesn't exist"
-            }),400
+            }), 400
         elif Reserve.query.filter_by(id=id, status="CONFIRMED").first():
-            return jsonify("Reservation already done"),400
+            return jsonify("Reservation already done"), 400
         reserve.status = "CONFIRMED"
         db.session.commit()
     return jsonify(reserve.serialize()), 200
-
 
 
 if __name__ == "__main__":
