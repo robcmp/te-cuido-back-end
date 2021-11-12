@@ -10,11 +10,8 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-<< << << < HEAD
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido'
-== == == =
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido'
->>>>>> > abb3a0e959022e692ba51395abedd41b8233a82c
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
