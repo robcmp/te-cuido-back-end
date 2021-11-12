@@ -190,6 +190,27 @@ def unbanuser(id):
     return jsonify(user.serialize()), 200
 
 
+@app.route("/reserve_rejection/<int:id>", methods=["PUT"])
+@cross_origin()
+def reserve_rejection(id):
+    if id is not None:
+        reserve = Reserve.query.filter_by(id=id).first()
+        if reserve is None:
+            return jsonify({
+                "msg": "Reserve doesn't exist"
+            }), 400
+        elif Reserve.query.filter_by(id=id, status="REJECTED").first():
+            return jsonify({
+                "msg": "Reserve was already rejected"
+            }), 400
+            # user = User.query.filter_by(id=user.id).first()
+        reserve.status = "REJECTED"
+        db.session.commit()
+
+    return jsonify(reserve.serialize()), 200
+
+
+
 @app.route("/edit_user/<int:id>", methods=["GET", "POST"])
 @cross_origin()
 def edit_user(id):
