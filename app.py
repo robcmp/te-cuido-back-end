@@ -10,7 +10,11 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
+<< << << < HEAD
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:pa3jH8!FuDb8DU@localhost:5432/tecuido'
+== == == =
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:ecomsur@localhost:5432/tecuido'
+>>>>>> > abb3a0e959022e692ba51395abedd41b8233a82c
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -523,6 +527,26 @@ def reserve_confirmation(id):
             return jsonify("Reservation already done"), 400
         reserve.status = "CONFIRMED"
         db.session.commit()
+    return jsonify(reserve.serialize()), 200
+
+
+@app.route("/reserve_rejection/<int:id>", methods=["PUT"])
+@cross_origin()
+def reserve_rejection(id):
+    if id is not None:
+        reserve = Reserve.query.filter_by(id=id).first()
+        if reserve is None:
+            return jsonify({
+                "msg": "Reserve doesn't exist"
+            }), 400
+        elif Reserve.query.filter_by(id=id, status="REJECTED").first():
+            return jsonify({
+                "msg": "Reserve was already rejected"
+            }), 400
+            # user = User.query.filter_by(id=user.id).first()
+        reserve.status = "REJECTED"
+        db.session.commit()
+
     return jsonify(reserve.serialize()), 200
 
 
