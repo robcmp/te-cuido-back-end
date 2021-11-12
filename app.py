@@ -482,25 +482,6 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route("/reserve_confirmation/<int:id>", methods=["PUT"])
 @cross_origin()
 def reserve_confirmation(id):
