@@ -536,3 +536,4 @@ def reserve_rejection(id):
         db.session.commit()
 
     return jsonify(user.serialize()), 200
+ 
