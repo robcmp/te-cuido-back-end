@@ -121,6 +121,19 @@ class Payment(db.Model):
     person_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     reserve = db.relationship('Reserve', backref='reserve', uselist=False)
 
+    def __repr__(self):
+        return "<Payment %r>" % self.id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'date': self.date,
+            'description': self.description,
+            'person_id': self.person_id,
+            'reserve': self.reserve
+        }
+
 
 class Reserve(db.Model):
     __tablename__ = 'reserve'

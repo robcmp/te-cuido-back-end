@@ -2,15 +2,17 @@ import re
 from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import Service, db, User, Reserve
+from models import Payment, Service, db, User, Reserve
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
 from flask_bcrypt import Bcrypt
-
+from flask_mail import Mail, Message
+import mercadopago
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido' 
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:admin@localhost:5432/tecuido'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
@@ -24,6 +26,20 @@ Migrate(app, db)
 cors = CORS(app)
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
+mail = Mail(app)
+
+
+# MAIL CONFIG
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'pruebatecuido1@gmail.com'
+app.config['MAIL_PASSWORD'] = 'Hola123.'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
+
+sdk = mercadopago.SDK(
+    "TEST-3228634650216916-111223-64bf0d1b49b876baaeea234ac0159d43-287091146")
 
 
 @app.route('/')
@@ -188,6 +204,7 @@ def unbanuser(id):
         db.session.commit()
 
     return jsonify(user.serialize()), 200
+
 
 @app.route("/edit_user/<int:id>", methods=["GET", "POST"])
 @cross_origin()
@@ -472,7 +489,7 @@ def reserved_service(id):
     if request.method == "GET":
 
         reserve = Reserve.query.filter_by(
-            carer_id=id, status='RESERVADO').all()
+            carer_id=id, status='RESERVED').all()
         if reserve is None:
             return jsonify({"msg", "Services doesn't exist"}), 404
         reserves = list(map(lambda x: x.serialize(), reserve))
@@ -501,7 +518,8 @@ def reservations_carer(id):
 @cross_origin()
 def reservations_client(id):
     if request.method == "GET":
-        reserve = Reserve.query.filter_by(client_id=id).all()
+        reserve = Reserve.query.filter_by(
+            client_id=id, status="CONFIRMED").all()
         if reserve is None:
             return jsonify({"msg", "Services doesn't exist"}), 404
         reservations = list(map(lambda x: x.serialize(), reserve))
@@ -509,6 +527,7 @@ def reservations_client(id):
     else:
         if id is not None:
             service = Service.query.filter_by(id=id, is_reserved=True).all()
+
 
 @app.route("/reserve_confirmation/<int:id>", methods=["PUT"])
 @cross_origin()
@@ -518,12 +537,23 @@ def reserve_confirmation(id):
         if reserve is None:
             return jsonify({
                 "msg": "Reserve doesn't exist"
-            }),400
+            }), 400
         elif Reserve.query.filter_by(id=id, status="CONFIRMED").first():
-            return jsonify("Reservation already done"),400
+            return jsonify("Reservation already done"), 400
         reserve.status = "CONFIRMED"
-        db.session.commit()
-    return jsonify(reserve.serialize()), 200
+        subject = "Confirmacion de Reserva"
+        body = "Reservacion confirmada"
+        msg = Message(
+            body=body,
+            sender='pruebatecuido1@gmail.com',
+            recipients=['roberto.cmp16@gmail.com'],
+            subject=subject
+        )
+        mail.send(msg)
+
+    db.session.commit()
+    return jsonify({"reserve": reserve.serialize(), "msg": "mail sent"}), 200
+
 
 @app.route("/reserve_rejection/<int:id>", methods=["PUT"])
 @cross_origin()
@@ -540,9 +570,58 @@ def reserve_rejection(id):
             }), 400
             # user = User.query.filter_by(id=user.id).first()
         reserve.status = "REJECTED"
+        subject = "Reservacion Rechazada"
+        body = "Reservacion rechazada"
+        msg = Message(
+            body=body,
+            sender='pruebatecuido1@gmail.com',
+            recipients=['roberto.cmp16@gmail.com'],
+            subject=subject
+        )
+        mail.send(msg)
+
         db.session.commit()
 
-    return jsonify(reserve.serialize()), 200
+        return jsonify({"reserve": reserve.serialize(), "msg": "mail sent"}), 200
+
+    @app.route("/payment/<int:id>", methods=["POST"])
+    @cross_origin()
+    def payment(id):
+        if id is not None:
+            reserve = Reserve.query.filter_by(id=id).first()
+
+            if reserve is None:
+                return jsonify({
+                    "msg": "Reserve doesn't exist"
+                }), 400
+
+            payment = Payment()
+            payment_name = request.json.get("name")
+            payment_description = request.json.get("description")
+            payment_person_id = request.json.get("person_id")
+
+            payment.name = payment_name
+            payment.date = datetime.now()
+            payment.description = payment_description
+            payment.person_id = payment_person_id
+            payment.reserve = id
+            db.session.add(payment)
+            preference_data = {
+                "items": [
+                    {
+                        "title": payment_name,
+                        "quantity": 1,
+                        "unit_price": 75
+                    }
+                ]
+            }
+            preference_response = sdk.preference().create(preference_data)
+            preference = preference_response["response"]
+            print(preference)
+            db.session.commit()
+
+            return jsonify("OK"), 200
+
 
 if __name__ == "__main__":
     app.run()

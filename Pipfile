@@ -12,9 +12,9 @@ psycopg2 = "*"
 flask-bcrypt = "*"
 flask-jwt-extended = "*"
 flask-mail = "*"
+mercadopago = "*"
 pipenv = "*"
 install = "*"
-mercadopago = "*"
 
 [dev-packages]
 autopep8 = "*"
