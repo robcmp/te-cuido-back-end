@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import Service, db, User, Reserve
+from models import Payment, Service, db, User, Reserve
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
@@ -37,6 +37,9 @@ app.config['MAIL_PASSWORD'] = 'Hola123.'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
+
+sdk = mercadopago.SDK(
+    "TEST-3228634650216916-111223-64bf0d1b49b876baaeea234ac0159d43-287091146")
 
 
 @app.route('/')
@@ -578,6 +581,44 @@ def reserve_rejection(id):
         db.session.commit()
 
         return jsonify({"reserve": reserve.serialize(), "msg": "mail sent"}), 200
+
+    @app.route("/payment/<int:id>", methods=["POST"])
+    @cross_origin()
+    def payment(id):
+        if id is not None:
+            reserve = Reserve.query.filter_by(id=id).first()
+
+            if reserve is None:
+                return jsonify({
+                    "msg": "Reserve doesn't exist"
+                }), 400
+
+            payment = Payment()
+            payment_name = request.json.get("name")
+            payment_description = request.json.get("description")
+            payment_person_id = request.json.get("person_id")
+
+            payment.name = payment_name
+            payment.date = datetime.now()
+            payment.description = payment_description
+            payment.person_id = payment_person_id
+            payment.reserve = id
+            db.session.add(payment)
+            preference_data = {
+                "items": [
+                    {
+                        "title": payment_name,
+                        "quantity": 1,
+                        "unit_price": 75
+                    }
+                ]
+            }
+            preference_response = sdk.preference().create(preference_data)
+            preference = preference_response["response"]
+            print(preference)
+            db.session.commit()
+
+            return jsonify("OK"), 200
 
 
 if __name__ == "__main__":
