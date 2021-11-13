@@ -401,8 +401,10 @@ def list_services():
 def service_history(user_id):
     if request.method == "GET":
         services = Service.query.filter_by(user_id=user_id).all()
+        if services is None:
+            return jsonify("services history doesn't exist", 404)
         services = list(map(lambda x: x.serialize(), services))
-        return jsonify(services)
+        return jsonify(services),200
 
 
 @app.route("/delete_services_by_id/<int:id>", methods=["DELETE"])
