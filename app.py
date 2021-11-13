@@ -7,7 +7,8 @@ from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_jwt
 from flask_bcrypt import Bcrypt
-
+from flask_mail import Mail, Message
+import mercadopago
 
 app = Flask(__name__)
 
@@ -25,6 +26,17 @@ Migrate(app, db)
 cors = CORS(app)
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
+mail = Mail(app)
+
+
+# MAIL CONFIG
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'pruebatecuido1@gmail.com'
+app.config['MAIL_PASSWORD'] = 'Hola123.'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
 
 
 @app.route('/')
@@ -472,7 +484,7 @@ def reserved_service(id):
     if request.method == "GET":
 
         reserve = Reserve.query.filter_by(
-            carer_id=id, status='RESERVADO').all()
+            carer_id=id, status='RESERVED').all()
         if reserve is None:
             return jsonify({"msg", "Services doesn't exist"}), 404
         reserves = list(map(lambda x: x.serialize(), reserve))
@@ -501,7 +513,8 @@ def reservations_carer(id):
 @cross_origin()
 def reservations_client(id):
     if request.method == "GET":
-        reserve = Reserve.query.filter_by(client_id=id).all()
+        reserve = Reserve.query.filter_by(
+            client_id=id, status="CONFIRMED").all()
         if reserve is None:
             return jsonify({"msg", "Services doesn't exist"}), 404
         reservations = list(map(lambda x: x.serialize(), reserve))
@@ -523,8 +536,18 @@ def reserve_confirmation(id):
         elif Reserve.query.filter_by(id=id, status="CONFIRMED").first():
             return jsonify("Reservation already done"), 400
         reserve.status = "CONFIRMED"
-        db.session.commit()
-    return jsonify(reserve.serialize()), 200
+        subject = "Confirmacion de Reserva"
+        body = "Reservacion confirmada"
+        msg = Message(
+            body=body,
+            sender='pruebatecuido1@gmail.com',
+            recipients=['roberto.cmp16@gmail.com'],
+            subject=subject
+        )
+        mail.send(msg)
+
+    db.session.commit()
+    return jsonify({"reserve": reserve.serialize(), "msg": "mail sent"}), 200
 
 
 @app.route("/reserve_rejection/<int:id>", methods=["PUT"])
@@ -542,9 +565,19 @@ def reserve_rejection(id):
             }), 400
             # user = User.query.filter_by(id=user.id).first()
         reserve.status = "REJECTED"
+        subject = "Reservacion Rechazada"
+        body = "Reservacion rechazada"
+        msg = Message(
+            body=body,
+            sender='pruebatecuido1@gmail.com',
+            recipients=['roberto.cmp16@gmail.com'],
+            subject=subject
+        )
+        mail.send(msg)
+
         db.session.commit()
 
-    return jsonify(reserve.serialize()), 200
+        return jsonify({"reserve": reserve.serialize(), "msg": "mail sent"}), 200
 
 
 if __name__ == "__main__":
