@@ -370,13 +370,14 @@ def services(id):
             if user is None:
                 return jsonify("User doesn't exist"), 404
             service = Service()
-            service.date_init = request.json.get("date_init")
+            service.date_start = request.json.get("date_start")
             service.date_end = request.json.get("date_end")
             service.age_start = request.json.get("age_start")
             service.age_end = request.json.get("age_end")
             service.notes = request.json.get("notes")
             service.gender = request.json.get("gender")
             service.price = request.json.get("price")
+            service.status = "CREATED"
             service.user_id = id
 
             db.session.add(service)
@@ -406,7 +407,7 @@ def delete_publication(id):
 @cross_origin()
 def list_services():
     if request.method == "GET":
-        services = Service.query.all()
+        services = Service.query.filter_by("CREATED").all()
         if services is None:
             return jsonify("services doesn't exist"), 404
         services = list(map(lambda x: x.serialize(), services))
@@ -461,9 +462,9 @@ def reserve(id):
             service = Service.query.filter_by(id=id).first()
             if service is None:
                 return jsonify("Service doesn't exist"), 404
-            service_date_start = service.date_init
+            service_date_start = service.date_start
             service_date_end = service.date_end
-            service.is_reserved = True
+            service.status = "RESERVED"
             reserve = Reserve()
             reserve.name = request.json.get("name")
             reserve.gender = request.json.get("gender")
