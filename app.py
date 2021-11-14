@@ -58,7 +58,6 @@ def user():
             return jsonify(user.serialize())
     else:
         user = User()
-        # request.get_json(force=True)
         user.name = request.json.get("name")
         user.last_name = request.json.get("last_name")
         user.password = request.json.get("password")
@@ -75,11 +74,8 @@ def user():
         user.vaccinated = request.json.get("vaccinated")
         user.role = request.json.get("role")
         user.is_active = request.json.get("is_active")
-        #user.payments = request.json.get("payments")
-
         db.session.add(user)
         db.session.commit()
-
     return jsonify(user.serialize()), 200
 
 
@@ -92,7 +88,6 @@ def userById(id):
             return jsonify('Missing id parameter in route'), 404
         else:
             return jsonify(user.serialize()), 200
-
     else:
         user = User()
         user.name = request.json.get("name")
@@ -107,35 +102,26 @@ def userById(id):
         user.vaccinated = request.json.get("vaccinated")
         user.role = request.json.get("role")
         user.is_active = request.json.get("is_active")
-        #user.payments = request.json.get("payments")
-
         db.session.add(user)
         db.session.commit()
-
     return jsonify(user.serialize()), 200
 
 
 @app.route("/login", methods=["POST"])
 @cross_origin()
 def login():
-    # request.get_json(force=True)
-    # print(request.json)
-
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     if password == "":
         return jsonify({
             "msg": "Invalid password or password field is empty"
         }), 400
-
     if email == "":
         return jsonify({
             "msg": "Invalid email or email field is empty"
         }), 400
-
     # Query your database for username and password
     user = User.query.filter_by(email=email).first()
-
     if user is None:
         # the user was not found on the database
         return jsonify({
@@ -152,9 +138,6 @@ def login():
         return jsonify({
             "msg": "Incorrect access credentials"
         }), 400
-    # create a new token with the user id inside
-
-    # return jsonify(user.serialize()), 200
 
 
 @app.route("/me", methods=["POST"])
@@ -182,7 +165,6 @@ def banuser(id):
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
-
     return jsonify(user.serialize()), 200
 
 
@@ -202,7 +184,6 @@ def unbanuser(id):
             # user = User.query.filter_by(id=user.id).first()
         user.is_active = request.json.get("is_active")
         db.session.commit()
-
     return jsonify(user.serialize()), 200
 
 
@@ -220,7 +201,6 @@ def edit_user(id):
             return jsonify('Missing id parameter in route'), 400
     else:
         user = User()
-        # request.get_json(force=True)
         user.name = request.json.get("name")
         user.last_name = request.json.get("last_name")
         user.password = request.json.get("password")
@@ -230,12 +210,9 @@ def edit_user(id):
         user.city = request.json.get("city")
         user.phone = request.json.get("phone")
         user.occupation = request.json.get("occupation")
-
         db.session.add(user)
         db.session.commit()
-
     return jsonify(user.serialize()), 200
-
 
 @app.route("/register", methods=["POST"])
 @cross_origin()
@@ -253,7 +230,6 @@ def register():
     vaccinated = request.json.get("vaccinated")
     role = request.json.get("role")
     is_active = request.json.get("is_active")
-    #payments = request.json.get("payments")
     user = User.query.filter_by(email=email).first()
     if user is None:
         user = User()
@@ -310,7 +286,6 @@ def delete_user(id):
             }), 404
         db.session.delete(user)
         db.session.commit()
-
     return jsonify({
         "msg": "User deleted"
     }), 200
@@ -327,7 +302,6 @@ def update_user(id):
         user.name = request.json.get("name")
         user.last_name = request.json.get("last_name")
         user.email = request.json.get("email")
-        # Validating email (REVISARLOS)
         email_regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
         if re.search(email_regex, user.email):
             email = user.email
@@ -340,11 +314,8 @@ def update_user(id):
         user.city = request.json.get("city")
         user.phone = request.json.get("phone")
         user.occupation = request.json.get("occupation")
-        #user.payments = request.json.get("payments")
-
         db.session.add(user)
         db.session.commit()
-
     return jsonify(user.serialize()), 200
 
 
@@ -378,10 +349,8 @@ def services(id):
             service.gender = request.json.get("gender")
             service.price = request.json.get("price")
             service.user_id = id
-
             db.session.add(service)
             db.session.commit()
-
         return jsonify(service.serialize()), 200
 
 
@@ -396,7 +365,6 @@ def delete_publication(id):
             }), 404
         db.session.delete(service)
         db.session.commit()
-
     return jsonify({
         "msg": "Service deleted"
     }), 200
@@ -457,7 +425,6 @@ def reserve(id):
                 return jsonify(reserve), 200
         else:
             return jsonify({"msg": "Missing id parameter"}), 404
-
     else:
         if id is not None:
             service = Service.query.filter_by(id=id).first()
@@ -479,7 +446,6 @@ def reserve(id):
             reserve.service_id = id
             db.session.add(reserve)
             db.session.commit()
-
         return jsonify(reserve.serialize()), 200
 
 
@@ -487,7 +453,6 @@ def reserve(id):
 @cross_origin()
 def reserved_service(id):
     if request.method == "GET":
-
         reserve = Reserve.query.filter_by(
             carer_id=id, status='RESERVED').all()
         if reserve is None:
@@ -503,7 +468,6 @@ def reserved_service(id):
 @cross_origin()
 def reservations_carer(id):
     if request.method == "GET":
-
         reserve = Reserve.query.filter_by(carer_id=id).all()
         if reserve is None:
             return jsonify({"msg", "Services doesn't exist"}), 404
@@ -550,7 +514,6 @@ def reserve_confirmation(id):
             subject=subject
         )
         mail.send(msg)
-
     db.session.commit()
     return jsonify({"reserve": reserve.serialize(), "msg": "mail sent"}), 200
 
@@ -579,17 +542,15 @@ def reserve_rejection(id):
             subject=subject
         )
         mail.send(msg)
-
         db.session.commit()
-
         return jsonify({"reserve": reserve.serialize(), "msg": "mail sent"}), 200
+
 
     @app.route("/payment/<int:id>", methods=["POST"])
     @cross_origin()
     def payment(id):
         if id is not None:
             reserve = Reserve.query.filter_by(id=id).first()
-
             if reserve is None:
                 return jsonify({
                     "msg": "Reserve doesn't exist"
@@ -599,7 +560,6 @@ def reserve_rejection(id):
             payment_name = request.json.get("name")
             payment_description = request.json.get("description")
             payment_person_id = request.json.get("person_id")
-
             payment.name = payment_name
             payment.date = datetime.now()
             payment.description = payment_description
@@ -619,7 +579,6 @@ def reserve_rejection(id):
             preference = preference_response["response"]
             print(preference)
             db.session.commit()
-
             return jsonify("OK"), 200
 
 
