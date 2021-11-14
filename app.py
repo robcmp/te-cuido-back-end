@@ -407,7 +407,7 @@ def delete_publication(id):
 @cross_origin()
 def list_services():
     if request.method == "GET":
-        services = Service.query.filter_by("CREATED").all()
+        services = Service.query.filter_by(status="CREATED").all()
         if services is None:
             return jsonify("services doesn't exist"), 404
         services = list(map(lambda x: x.serialize(), services))
