@@ -55,14 +55,16 @@ class Service(db.Model):
     __tablename__ = 'service'
     id = db.Column(db.Integer, primary_key=True)
     gender = db.Column(db.Integer, nullable=False)
-    date_init = db.Column(db.DateTime, nullable=False)
+    date_start = db.Column(db.DateTime, nullable=False)
     date_end = db.Column(db.DateTime, nullable=False)
     age_start = db.Column(db.Integer, nullable=False)
     age_end = db.Column(db.Integer, nullable=False)
     notes = db.Column(db.String(300), nullable=False)
+    status = db.Column(db.String(10), nullable=False)
     price = db.Column(db.Numeric(10, 2))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship("User")
+
     reserve_id = db.relationship("Reserve", backref="service", uselist=False)
 
     def __repr__(self):
@@ -72,11 +74,12 @@ class Service(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'date_init': self.date_init,
+            'date_start': self.date_start,
             'date_end': self.date_end,
             'age_start': self.age_start,
             'age_end': self.age_end,
             'notes': self.notes,
+            'status': self.status,
             'gender': self.gender,
             'price': self.price
         }
